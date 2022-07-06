@@ -22,10 +22,27 @@ class Wallet {
     }
 
     createTransaction(to, amount, type, blockchain, transactionPool) {
+      this.balance = this.getBalance(blockchain);
+      if (amount > this.balance) {
+        console.log(
+          `Insufficient funds!!! ${amount} exceeds your current balance: ${this.balance}`
+        );
+        return;
+      }
       let transaction = Transaction.newTransaction(this, to, amount, type);
       transactionPool.addTransaction(transaction);
       return transaction;
     }
+  
+    getBalance(blockchain) {
+      return blockchain.getBalance(this.publicKey);
+    }
+  
+    getPublicKey() {
+      return this.publicKey;
+    }
+
+    
   }
 
   module.exports = Wallet;
