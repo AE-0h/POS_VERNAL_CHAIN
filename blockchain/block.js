@@ -1,6 +1,6 @@
 
 const SHA256 = require('crypto-js/sha256');
-const ChainUtil = require('../chainUtils');
+
 
 class Block {
 
@@ -29,7 +29,7 @@ class Block {
     static genesis() {
 
       let previousHash = null;
-      return new this(`1656363054`, `${previousHash}`, `F0D5D285861E416779631DDBA16DCC1E2F95CD49C8AFF4D50D3B66D207371753`, []);
+      return new this(`⚙️🥚⚙️`, `${previousHash}`, `F0D5D285861E416779631DDBA16DCC1E2F95CD49C8AFF4D50D3B66D207371753`, []);
       }
 
     static hash(timestamp,lastHash,data){
@@ -45,8 +45,8 @@ class Block {
         return new this(timestamp, lastHash, hash, data);
       }
     static blockHash(block){
-        const { timestamp, lastHash, data } = block;
-        return Block.hash(timestamp,lastHash,data);
+        const { timestamp, lastHash, _data } = block;
+        return Block.hash(timestamp,lastHash,_data);
     }
 
 
