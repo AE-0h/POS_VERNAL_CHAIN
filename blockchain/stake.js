@@ -24,7 +24,7 @@ class Stake{
 
     getMax(addresses){
         let balance = -1;
-        let leader ;
+        let leader;
         addresses.forEach(address => {
             if (this.getBalance(address) > balance) {
               leader = address;
