@@ -36,14 +36,19 @@ class Block {
         return SHA256(`${timestamp}${lastHash}${data}`).toString();
     }
     
-    static createBlock(lastBlock, data) {
-        let hash;
-        let timestamp = Date.now();
-        const lastHash = lastBlock.hash;
-        hash = Block.hash(timestamp, lastHash, data);
-    
-        return new this(timestamp, lastHash, hash, data);
-      }
+    static createBlock(lastBlock, data, wallet) {
+      let hash;
+      let timestamp = Date.now();
+      const lastHash = lastBlock.hash;
+      hash = Block.hash(timestamp, lastHash, data);
+      
+      // get the validators public key
+      let validator = wallet.getPublicKey();
+      
+      // Sign the block
+      let signature = Block.signBlockHash(hash, wallet);
+      return new this(timestamp, lastHash, hash, data, validator, signature);
+    }
     static blockHash(block){
         const { timestamp, lastHash, _data } = block;
         return Block.hash(timestamp,lastHash,_data);

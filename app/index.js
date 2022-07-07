@@ -40,14 +40,14 @@ app.get('/transactions',(req,res)=>{
   });
 
 //api to add blocks
-app.post('/mine',(req,res)=>{
-    const block = blockchain.addBlock(req.body.data);
-    console.log(`New block added: ${block.toString()}`);
-    p2pserver.syncChain();
+// app.post('/mine',(req,res)=>{
+//     const block = blockchain.addBlock(req.body.data);
+//     console.log(`New block added: ${block.toString()}`);
+//     p2pserver.syncChain();
 
-    res.redirect('/blocks');
+//     res.redirect('/blocks');
 
-});
+// });
 
 app.post("/transact", (req, res) => {
   const { to, amount, type } = req.body;
@@ -60,6 +60,19 @@ app.post("/transact", (req, res) => {
   );
   p2pserver.broadcastTransaction(transaction);
   res.redirect("/transactions");
+});
+
+app.get("/bootstrap", (req, res) => {
+  p2pserver.bootstrapSystem();
+  res.json({ message: "System bootstraped" });
+});
+
+app.get("/public-key", (req, res) => {
+  res.json({ publicKey: wallet.publicKey });
+});
+
+app.get("/balance", (req, res) => {
+  res.json({ balance: blockchain.getBalance(wallet.publicKey) });
 });
 // app server configurations
 

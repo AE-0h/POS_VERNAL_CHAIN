@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./app"
+    "dev": "nodemon ./app",
+    "ico": "nodemon ./ico"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,9 @@
 const Block = require('./block');
+const Stake = require("./stake");
+const Account = require("./account");
+const Validators = require("./validators");
+const Wallet = require("../wallet/wallet");
+let secret = "i am the first leader";
 
 class Blockchain{
     constructor(){
@@ -11,6 +16,15 @@ class Blockchain{
 
           return _block;
     }
+
+    createBlock(transactions, wallet) {
+        const block = Block.createBlock(
+          this.chain[this.chain.length - 1],
+          transactions,
+          wallet
+        );
+        return block;
+      }
 
     isValidChain(chain){
         if(JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
@@ -45,8 +59,60 @@ class Blockchain{
         return this.accounts.getBalance(publicKey);
       }
 
-    
+    getLeader() {
+        return this.stakes.getMax(this.validators.list);
+      }
 
+      isValidBlock(block) {
+        const lastBlock = this.chain[this.chain.length - 1];
+        /**
+         * check hash
+         * check last hash
+         * check signature
+         * check leader
+         */
+        if (
+          block.lastHash === lastBlock.hash &&
+          block.hash === Block.blockHash(block) &&
+          Block.verifyBlock(block) &&
+          Block.verifyLeader(block, this.getLeader())
+        ) {
+          console.log("block valid");
+          this.addBlock(block);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    executeTransactions(block) {
+    block.data.forEach(transaction => {
+      switch (transaction.type) {
+        case TRANSACTION_TYPE.transaction:
+          this.accounts.update(transaction);
+          this.accounts.transferFee(block, transaction);
+          break;
+        case TRANSACTION_TYPE.stake:
+          this.stakes.update(transaction);
+          this.accounts.decrement(
+            transaction.input.from,
+            transaction.output.amount
+          );
+          this.accounts.transferFee(block, transaction);
+
+          break;
+        case TRANSACTION_TYPE.validator_fee:
+          if (this.validators.update(transaction)) {
+            this.accounts.decrement(
+              transaction.input.from,
+              transaction.output.amount
+            );
+            this.accounts.transferFee(block, transaction);
+          }
+          break;
+      }
+    });
+  } 
+      
 }
 
 module.exports = Blockchain;

@@ -1,7 +1,7 @@
 class Stake{
     contructor(){
-        this.addresses = [];
-        this.balance = {};
+        this.addresss = ['34b0b480d6cbc49b861cd0b2a62e7325ef9f34055cd72c9acd93b10795df26c8'];
+        this.balance = {'34b0b480d6cbc49b861cd0b2a62e7325ef9f34055cd72c9acd93b10795df26c8': 0};
     }
 
     initialize(address){
@@ -14,10 +14,10 @@ class Stake{
 
     addStake(from, amount){
         this.initialize(from);
-        return this.balance[address];
+        this.balance[from] += amount;
     }
 
-    getStake(addresses){
+    getBalance(address){
         this.initialize(address);
         return this.balance[address];
     }
