@@ -1,5 +1,6 @@
 
 const SHA256 = require('crypto-js/sha256');
+const ChainUtil = require("../chain-util");
 
 
 class Block {
@@ -33,18 +34,18 @@ class Block {
       }
 
     static hash(timestamp,lastHash,data){
-        return SHA256(`${timestamp}${lastHash}${data}`).toString();
+      return SHA256(JSON.stringify(`${timestamp}${lastHash}${data}`)).toString();
     }
     
-    static createBlock(lastBlock, data, wallet) {
+    static createBlock(lastBlock, _data, wallet) {
       let hash;
       let timestamp = Date.now();
       const lastHash = lastBlock.hash;
+      let data = [];
+      data.push(_data);
       hash = Block.hash(timestamp, lastHash, data);
-      
       // get the validators public key
       let validator = wallet.getPublicKey();
-      
       // Sign the block
       let signature = Block.signBlockHash(hash, wallet);
       return new this(timestamp, lastHash, hash, data, validator, signature);
@@ -54,6 +55,21 @@ class Block {
         return Block.hash(timestamp,lastHash,_data);
     }
 
+    static signBlockHash(hash, wallet) {
+      return wallet.sign(hash);
+    }
+  
+    static verifyBlock(block) {
+      return ChainUtil.verifySignature(
+        block.validator,
+        block.signature,
+        Block.hash(block.timestamp, block.lastHash, block.data)
+      );
+    }
+  
+    static verifyLeader(block, leader) {
+      return block.validator == leader ? true : false;
+    }
 
   }
 

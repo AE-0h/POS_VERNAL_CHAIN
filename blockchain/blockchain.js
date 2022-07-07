@@ -5,15 +5,24 @@ const Validators = require("./validators");
 const Wallet = require("../wallet/wallet");
 let secret = "i am the first leader";
 
+const TRANSACTION_TYPE = {
+  transaction: "TRANSACTION",
+  stake: "STAKE",
+  validator_fee: "VALIDATOR_FEE"
+};
+
 class Blockchain{
     constructor(){
-        this.chain = [Block.genesis()];
+      this.chain = [Block.genesis()];
+      this.stakes = new Stake();
+      this.accounts = new Account();
+      this.validators = new Validators();
     }
 
     addBlock(data) {
-      const _block = Block.createBlock(this.chain[this.chain.length-1],data);
+      const _block = Block.createBlock(this.chain[this.chain.length-1], data, new Wallet(secret));
           this.chain.push(_block);
-
+          console.log("NEW BLOCK APPENDED TO CHAIN");
           return _block;
     }
 
@@ -43,16 +52,18 @@ class Blockchain{
     }
 
     replaceChain(newChain){
-        if(newChain.length <= this.chain.length){
-            console.log("Recieved chain is not longer than the current chain");
-            return;
-        }else if(!this.isValidChain(newChain)){
-            console.log("Recieved chain is invalid");
-            return;
-        }
-        
-        console.log("Replacing the current chain with new chain");
-        this.chain = newChain; 
+      if (newChain.length <= this.chain.length) {
+        console.log("Recieved chain is not longer than the current chain");
+        return;
+      } else if (!this.isValidChain(newChain)) {
+        console.log("Recieved chain is invalid");
+        return;
+      }
+  
+      console.log("Replacing the current chain with new chain");
+      this.resetState();
+      this.executeChain(newChain);
+      this.chain = newChain;
     }
 
     getBalance(publicKey) {
@@ -65,12 +76,6 @@ class Blockchain{
 
       isValidBlock(block) {
         const lastBlock = this.chain[this.chain.length - 1];
-        /**
-         * check hash
-         * check last hash
-         * check signature
-         * check leader
-         */
         if (
           block.lastHash === lastBlock.hash &&
           block.hash === Block.blockHash(block) &&
@@ -79,6 +84,7 @@ class Blockchain{
         ) {
           console.log("block valid");
           this.addBlock(block);
+          this.executeTransactions(block);
           return true;
         } else {
           return false;
@@ -111,6 +117,18 @@ class Blockchain{
           break;
       }
     });
+  }
+  executeChain(chain) {
+    chain.forEach(block => {
+      this.executeTransactions(block);
+    });
+  }
+
+  resetState() {
+    this.chain = [Block.genesis()];
+    this.stakes = new Stake();
+    this.accounts = new Account();
+    this.validators = new Validators();
   } 
       
 }
