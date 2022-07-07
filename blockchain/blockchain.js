@@ -1,8 +1,8 @@
 const Block = require('./block');
 const Stake = require("./stake");
 const Account = require("./account");
-const Validators = require("./validators");
-const Wallet = require("../wallet/wallet");
+const Validators = require("./validator");
+const Wallet = require("../wallets/wallet");
 let secret = "i am the first leader";
 
 const TRANSACTION_TYPE = {
