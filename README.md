@@ -1,4 +1,4 @@
-⚠️ W.I.P.
+#⚠️ W.I.P.
 
 
-A proof of stake blockchain, proof of concept.  
+##A proof of stake blockchain, proof of concept.  
